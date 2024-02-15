@@ -13,7 +13,7 @@ __all__ = ['anderson_solver']
 
 def anderson_solver(func, x0, 
         max_iter=50, tol=1e-3, stop_mode='abs', indexing=None,
-        m=6, lam=1e-4, tau=1.0, return_final=False, 
+        m=6, lam=1e-4, tau=1.0, return_final=False, first_hit_under_tol=False,
         **kwargs):
     """
     Implements the Anderson acceleration for fixed-point iteration.
@@ -74,6 +74,10 @@ def anderson_solver(func, x0,
 
     trace_dict, lowest_dict, lowest_step_dict = init_solver_info(bsz, x0.device)
     lowest_xest = x0
+    hit_under_tol_dict = {
+        'abs': torch.zeros_like(lowest_dict['abs']).bool(),
+        'rel': torch.zeros_like(lowest_dict['rel']).bool(),
+    }
 
     indexing_list = []
 
@@ -96,7 +100,7 @@ def anderson_solver(func, x0,
         lowest_xest = update_state(
                 lowest_xest, F[:,k%m].view_as(x0), k+1,
                 stop_mode, abs_diff, rel_diff, 
-                trace_dict, lowest_dict, lowest_step_dict, return_final
+                trace_dict, lowest_dict, lowest_step_dict, return_final, tol=tol if first_hit_under_tol else -1e9, hit_under_tol_dict=hit_under_tol_dict,
                 )
 
         # Store the solution at the specified index

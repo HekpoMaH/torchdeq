@@ -93,7 +93,7 @@ def update_state(
         lowest_xest, x_est, nstep, 
         stop_mode, abs_diff, rel_diff, 
         trace_dict, lowest_dict, lowest_step_dict, 
-        return_final=False
+        return_final=False, tol=-1e9, hit_under_tol_dict=None
         ):
     """
     Updates the state of the solver during each iteration.
@@ -117,9 +117,16 @@ def update_state(
                      'rel': rel_diff}
     trace_dict['abs'].append(abs_diff)
     trace_dict['rel'].append(rel_diff)
+
+    if hit_under_tol_dict is None:
+        hit_under_tol_dict = {
+            'abs': torch.zeros_like(abs_diff).bool(),
+            'rel': torch.zeros_like(rel_diff).bool(),
+        }
  
     for mode in ['rel', 'abs']:
-        is_lowest = (diff_dict[mode] < lowest_dict[mode]) + return_final
+        is_lowest = ((diff_dict[mode] < lowest_dict[mode]) & (~hit_under_tol_dict[mode])) + return_final
+        hit_under_tol_dict[mode] |= (diff_dict[mode] < tol)
         if mode == stop_mode:
             lowest_xest = batch_masked_mixing(is_lowest, x_est, lowest_xest)
             lowest_xest = lowest_xest.clone().detach() 
