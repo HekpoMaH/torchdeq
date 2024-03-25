@@ -121,7 +121,7 @@ def matvec(part_Us, part_VTs, x):
 
 def broyden_solver(func, x0, 
         max_iter=50, tol=1e-3, stop_mode='abs', indexing=None,
-        LBFGS_thres=None, ls=False, return_final=False, 
+        LBFGS_thres=None, ls=False, return_final=False, first_hit_under_tol=False,
         **kwargs):
     """
     Implements the Broyden's method for solving a system of nonlinear equations.
@@ -176,6 +176,11 @@ def broyden_solver(func, x0,
     # Initialize tracking dictionaries for solver statistics
     trace_dict, lowest_dict, lowest_step_dict = init_solver_info(bsz, x0.device)
     nstep, lowest_xest = 0, x0
+
+    hit_under_tol_dict = {
+        'abs': torch.zeros_like(lowest_dict['abs']).bool(),
+        'rel': torch.zeros_like(lowest_dict['rel']).bool(),
+    }
     
     indexing_list = []
 
@@ -193,7 +198,7 @@ def broyden_solver(func, x0,
         lowest_xest = update_state(
                 lowest_xest, x_est.view_as(x0), nstep, 
                 stop_mode, abs_diff, rel_diff, 
-                trace_dict, lowest_dict, lowest_step_dict, return_final
+                trace_dict, lowest_dict, lowest_step_dict, return_final, tol=tol if first_hit_under_tol else -1e9, hit_under_tol_dict=hit_under_tol_dict,
                 )
 
         # Store the solution at the specified index

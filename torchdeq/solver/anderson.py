@@ -14,6 +14,7 @@ __all__ = ['anderson_solver']
 def anderson_solver(func, x0, 
         max_iter=50, tol=1e-3, stop_mode='abs', indexing=None,
         m=6, lam=1e-4, tau=1.0, return_final=False, first_hit_under_tol=False,
+        return_all=False,
         **kwargs):
     """
     Implements the Anderson acceleration for fixed-point iteration.
@@ -79,7 +80,7 @@ def anderson_solver(func, x0,
         'rel': torch.zeros_like(lowest_dict['rel']).bool(),
     }
 
-    indexing_list = []
+    indexing_list = [X[:, 1]]
 
     for k in range(2, max_iter):
         # Apply the Anderson mixing process to compute a new estimate
@@ -104,7 +105,7 @@ def anderson_solver(func, x0,
                 )
 
         # Store the solution at the specified index
-        if indexing and (k+1) in indexing:
+        if (indexing and (k+1) in indexing) or return_all:
             indexing_list.append(lowest_xest)
 
         # If the difference is smaller than the given tolerance, terminate the loop early
@@ -121,4 +122,6 @@ def anderson_solver(func, x0,
     X = F = None
  
     info = solver_stat_from_info(stop_mode, lowest_dict, trace_dict, lowest_step_dict)
+    if return_all:
+        info['trajectory'] = indexing_list
     return lowest_xest, indexing_list, info
