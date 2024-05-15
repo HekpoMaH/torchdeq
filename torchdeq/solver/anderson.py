@@ -106,7 +106,7 @@ def anderson_solver(func, x0,
 
         # Store the solution at the specified index
         if (indexing and (k+1) in indexing) or return_all:
-            indexing_list.append(lowest_xest)
+            indexing_list.append(F[:,k%m].view_as(x0))
 
         # If the difference is smaller than the given tolerance, terminate the loop early
         if not return_final and trace_dict[stop_mode][-1].max() < tol:
