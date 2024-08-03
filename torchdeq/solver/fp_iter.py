@@ -9,6 +9,7 @@ __all__ = ['fixed_point_iter', 'simple_fixed_point_iter']
 def fixed_point_iter(func, x0, 
         max_iter=50, tol=1e-3, stop_mode='abs', indexing=None, 
         tau=1.0, return_final=False, 
+        return_all=False,
         **kwargs):
     """
     Implements the fixed-point iteration solver for solving a system of nonlinear equations.
@@ -67,7 +68,7 @@ def fixed_point_iter(func, x0,
                 )
 
          # If indexing is enabled, store the solution at the specified indices
-        if indexing and (k+1) in indexing:
+        if (indexing and (k+1) in indexing) or return_all:
             indexing_list.append(lowest_xest)
 
         # If the difference is smaller than the given tolerance, terminate the loop early
@@ -82,6 +83,8 @@ def fixed_point_iter(func, x0,
         indexing_list.append(lowest_xest)
 
     info = solver_stat_from_info(stop_mode, lowest_dict, trace_dict, lowest_step_dict)
+    if return_all:
+        info['trajectory'] = indexing_list
     return lowest_xest, indexing_list, info
 
 
