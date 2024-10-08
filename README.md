@@ -37,18 +37,10 @@ Dive into the world of DEQ with TorchDEQ! Craft your own DEQ effortlessly in jus
 
 ## Installation
 
-- Through pip.
-
-    ```bash
-    pip install torchdeq
-    ```
-
-- From source.
-
-    ```bash
-    git clone https://github.com/locuslab/torchdeq.git && cd torchdeq
-    pip install -e .
-    ```
+```bash
+git clone https://github.com/HekpoMaH/torchdeq.git && cd torchdeq
+pip install -e .
+```
 
 ## Quick Start
 
