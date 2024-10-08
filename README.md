@@ -39,6 +39,7 @@ Dive into the world of DEQ with TorchDEQ! Craft your own DEQ effortlessly in jus
 
 ```bash
 git clone https://github.com/HekpoMaH/torchdeq.git && cd torchdeq
+git checkout alignment
 pip install -e .
 ```
 
